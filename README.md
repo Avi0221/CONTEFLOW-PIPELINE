@@ -241,12 +241,12 @@ CONTEFLOW-PIPELINE/
 POD-39 | AiForEveryOne|Training
 
 👥 Group Members
-Avinash
-Dev Kumar Mahato
-Falak Fatima
-Himanshu kumar
-Hrittika Dey
-Nandini Kumari
+* Avinash
+* Dev Kumar Mahato
+* Falak Fatima
+* Himanshu kumar
+* Hrittika Dey
+* Nandini Kumari
 
 ---
 
