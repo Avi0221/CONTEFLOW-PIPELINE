@@ -317,7 +317,7 @@ export default function Home() {
     <button
       onClick={() => {
         const clientId = '86kg8zpq9jbo07';
-        const redirectUri = encodeURIComponent('http://localhost:3001/api/linkedin/callback');
+        const redirectUri = encodeURIComponent('https://conteflow-pipeline.vercel.app/api/linkedin/callback');
         const scope = encodeURIComponent('openid profile email w_member_social');
         window.location.href = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
       }}
