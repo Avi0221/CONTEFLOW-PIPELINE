@@ -1,0 +1,4 @@
+🚀 Pipeline API server running on http://localhost:3000
+   POST http://localhost:3000/pipeline
+   GET  http://localhost:3000/health
+   GET  http://localhost:3000/runs
