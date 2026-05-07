@@ -48,13 +48,13 @@ export default function SignUp() {
       <div style={{ textAlign: 'center', maxWidth: '400px', padding: '24px' }}>
         <CheckCircle size={48} color="#4ade80" style={{ marginBottom: '20px' }} />
         <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', fontWeight: 700, color: '#fff', marginBottom: '12px' }}>
-          Check your email!
+          Signup successful!
         </h2>
         <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '28px', lineHeight: 1.6 }}>
-          We sent a confirmation link to <strong style={{ color: '#fff' }}>{email}</strong>. Click it to activate your account.
+          Your account for <strong style={{ color: '#fff' }}>{email}</strong> is ready. You can start generating content now.
         </p>
-        <Link href="/signin" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', borderRadius: '10px', background: 'linear-gradient(135deg, #6c63ff, #9c8ef7)', color: '#fff', textDecoration: 'none', fontSize: '15px', fontWeight: 600 }}>
-          Go to Sign in <ArrowRight size={16} />
+        <Link href="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', borderRadius: '10px', background: 'linear-gradient(135deg, #6c63ff, #9c8ef7)', color: '#fff', textDecoration: 'none', fontSize: '15px', fontWeight: 600 }}>
+          Go to Dashboard <ArrowRight size={16} />
         </Link>
       </div>
     </main>
