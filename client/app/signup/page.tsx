@@ -25,6 +25,7 @@ export default function SignUp() {
       email,
       password,
       options: {
+        emailRedirectTo: `${window.location.origin}/signin?confirmed=true`,
         data: { full_name: name }
       }
     });

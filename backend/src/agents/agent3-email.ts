@@ -35,10 +35,11 @@ interface EmailNewsletter {
 }
 
 export async function generateEmailNewsletter(
-  blogPost: BlogPost
+  blogPost: BlogPost,
+  apiKey: string = groqApiKey
 ): Promise<EmailNewsletter> {
   const client = new Groq({
-    apiKey: groqApiKey,
+    apiKey,
   });
 
   console.log("Agent 3 starting - Email Newsletter Generator");

@@ -2,13 +2,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Navbar from '../../components/Navbar';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/supabase';
 import { Clock, FileText, Globe, Mail, Search, ArrowRight, RotateCcw } from 'lucide-react';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface Run {
   id: string;
@@ -29,6 +24,7 @@ export default function History() {
   const [runs, setRuns] = useState<Run[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [authError, setAuthError] = useState('');
 
   useEffect(() => {
     fetchRuns();
@@ -36,9 +32,22 @@ export default function History() {
 
   async function fetchRuns() {
     setLoading(true);
+    setAuthError('');
+
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData.user;
+
+    if (!user) {
+      setRuns([]);
+      setAuthError('Please sign in to view your history.');
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('pipeline_runs')
       .select('id, created_at, topic, audience, tone, status, blog_title, blog_word_count, blog_published, social_published, email_sent, seo_focus_keyword')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -128,6 +137,14 @@ export default function History() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'rgba(255,255,255,0.3)' }}>
             Loading runs...
+          </div>
+        ) : authError ? (
+          <div style={{ textAlign: 'center', padding: '60px', color: 'rgba(255,255,255,0.3)' }}>
+            {authError}
+            <br />
+            <Link href="/signin" style={{ display: 'inline-block', marginTop: '16px', padding: '10px 24px', borderRadius: '8px', background: 'linear-gradient(135deg, #6c63ff, #9c8ef7)', color: '#fff', textDecoration: 'none', fontSize: '14px' }}>
+              Sign in
+            </Link>
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'rgba(255,255,255,0.3)' }}>

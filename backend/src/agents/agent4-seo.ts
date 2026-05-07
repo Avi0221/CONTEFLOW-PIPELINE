@@ -32,9 +32,12 @@ interface SEOData {
   faq: { question: string; answer: string }[];
 }
 
-export async function generateSEOData(blogPost: BlogPost): Promise<SEOData> {
+export async function generateSEOData(
+  blogPost: BlogPost,
+  apiKey: string = groqApiKey
+): Promise<SEOData> {
   const client = new Groq({
-    apiKey: groqApiKey,
+    apiKey,
   });
 
   console.log("Agent 4 starting - SEO Optimizer");

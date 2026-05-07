@@ -1,4 +1,4 @@
-# 🚀 CONTEFLOW PIPELINE
+# 🚀 CONTEFLOW - A Content Marketing Pipeline Agent
 
 ### AI-Powered Multi-Agent Content Marketing Automation Platform
 
@@ -247,6 +247,7 @@ POD-39 | AiForEveryOne|Training
 * Himanshu kumar
 * Hrittika Dey
 * Nandini Kumari
+* Arghyadeep Kuity
 
 ---
 

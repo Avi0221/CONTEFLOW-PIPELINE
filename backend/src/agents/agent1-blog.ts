@@ -24,10 +24,11 @@ interface BlogPost {
 export async function generateBlogPost(
   topic: string,
   audience: string = "business professionals",
-  tone: string = "informative and engaging"
+  tone: string = "informative and engaging",
+  apiKey: string = groqApiKey
 ): Promise<BlogPost> {
   const client = new Groq({
-  apiKey: groqApiKey,
+  apiKey,
 });
 
   console.log(`\n🤖 Agent 1 starting — Topic: "${topic}"`);

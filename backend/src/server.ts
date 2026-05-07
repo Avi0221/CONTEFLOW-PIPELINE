@@ -27,14 +27,49 @@ const server = Bun.serve({
           topic: string;
           audience?: string;
           tone?: string;
+          groqApiKey?: string;
+          userId?: string;
+          userEmail?: string;
         };
 
         const { topic, audience, tone } = body;
+        const requestGroqApiKey = body.groqApiKey?.trim();
 
         if (!topic) {
           return new Response(
             JSON.stringify({ error: "topic is required" }),
             { status: 400, headers: { "Content-Type": "application/json" } }
+          );
+        }
+
+        const authHeader = req.headers.get("authorization");
+        const accessToken = authHeader?.replace("Bearer ", "");
+
+        if (!authHeader || !accessToken) {
+          return new Response(
+            JSON.stringify({ error: "Authentication is required" }),
+            { status: 401, headers: { "Content-Type": "application/json" } }
+          );
+        }
+
+        const userSupabase = createClient(
+          supabaseConfig.url,
+          supabaseConfig.anonKey,
+          {
+            global: {
+              headers: {
+                Authorization: authHeader,
+              },
+            },
+          }
+        );
+
+        const { data: userData, error: authError } = await userSupabase.auth.getUser(accessToken);
+
+        if (authError || !userData.user) {
+          return new Response(
+            JSON.stringify({ error: "Invalid or expired session" }),
+            { status: 401, headers: { "Content-Type": "application/json" } }
           );
         }
 
@@ -53,9 +88,11 @@ const server = Bun.serve({
 
         console.log("💾 Saving to Supabase...");
 
-        const { data, error } = await supabase
+        const { data, error } = await userSupabase
           .from("pipeline_runs")
           .insert({
+            user_id: userData.user.id,
+            user_email: userData.user.email,
             topic,
             audience: audience || "business professionals",
             tone: tone || "informative and engaging",

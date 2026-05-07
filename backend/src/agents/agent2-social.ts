@@ -25,9 +25,12 @@ interface SocialMediaPosts {
   instagram: { caption: string; hashtags: string[]; emoji_hook: string; character_count: number };
 }
 
-export async function generateSocialPosts(blogPost: BlogPost): Promise<SocialMediaPosts> {
+export async function generateSocialPosts(
+  blogPost: BlogPost,
+  apiKey: string = groqApiKey
+): Promise<SocialMediaPosts> {
   const client = new Groq({
-    apiKey: groqApiKey,
+    apiKey,
   });
 
   console.log("Agent 2 starting - Social Media Generator");

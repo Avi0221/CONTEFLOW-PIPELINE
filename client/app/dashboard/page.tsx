@@ -3,6 +3,7 @@ import Navbar from '../../components/Navbar';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Zap, Globe, Mail, Search, Clock, CheckCircle, ArrowRight, BarChart3 } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 const TONES = ['Professional', 'Casual', 'Humorous', 'Authoritative', 'Inspirational'];
 const AUDIENCES = ['Marketing Managers', 'Startup Founders', 'General Public', 'B2B Executives', 'Small Business Owners'];
@@ -100,6 +101,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('blog');
   const [copied, setCopied] = useState('');
   const [error, setError] = useState('');
+  const [needsSignIn, setNeedsSignIn] = useState(false);
   const blogFilename = `${result?.blog_post.slug || 'blog-post'}.md`;
 
   const agents = [
@@ -114,7 +116,18 @@ export default function Home() {
     setLoading(true);
     setResult(null);
     setError('');
+    setNeedsSignIn(false);
     setAgentStatus([]);
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+
+    if (!accessToken) {
+      setError('Please sign in before generating content.');
+      setNeedsSignIn(true);
+      setLoading(false);
+      return;
+    }
 
     const delays = [1000, 20000, 35000, 50000];
     delays.forEach((delay, i) => {
@@ -129,7 +142,10 @@ export default function Home() {
     try {
       const res = await fetch('/api/pipeline', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
         body: JSON.stringify({ topic, tone: tone.toLowerCase(), audience }),
         signal: controller.signal,
       });
@@ -265,9 +281,18 @@ export default function Home() {
             )}
           </button>
 
+          <div style={{ marginTop: '10px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '13px' }}>
+            Sign in first to generate content and save it to your private history.
+          </div>
+
           {error && (
             <div style={{ marginTop: '16px', padding: '12px 16px', background: 'rgba(239,68,68,0.1)', border: '0.5px solid rgba(239,68,68,0.3)', borderRadius: '10px', color: '#f87171', fontSize: '14px' }}>
               {error}
+              {needsSignIn && (
+                <a href="/signin" style={{ display: 'inline-block', marginLeft: '10px', color: '#fff', fontWeight: 700, textDecoration: 'underline' }}>
+                  Sign in
+                </a>
+              )}
             </div>
           )}
         </motion.div>
@@ -450,6 +475,7 @@ export default function Home() {
     style={{ flex: 1, padding: '10px', borderRadius: '8px', background: 'rgba(240,98,146,0.1)', border: '0.5px solid rgba(240,98,146,0.3)', color: '#f06292', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}>
     ⬇️ Download .txt
   </button>
+  {platform.name === 'LinkedIn' && (
   <button
   onClick={async () => {
     try {
@@ -479,6 +505,7 @@ export default function Home() {
   }}>
   🚀 Post to LinkedIn
 </button>
+  )}
 </div>
                           </div>
                         </div>
@@ -510,7 +537,7 @@ export default function Home() {
   <button onClick={() => downloadFile(buildEmailHTML(result.email_newsletter), 'email-newsletter.html', 'text/html')}
     style={{ flex: 1, padding: '10px', borderRadius: '8px', background: 'rgba(77,208,225,0.1)', border: '0.5px solid rgba(77,208,225,0.3)', color: '#4dd0e1', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}>
     ⬇️ Download .html
-  </button>
+</button>
 </div>
                         {result.email_newsletter.cta_button_text} →
                       </div>
