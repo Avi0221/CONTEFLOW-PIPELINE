@@ -1,6 +1,6 @@
 'use client';
 import Navbar from '../../components/Navbar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Zap, Globe, Mail, Search, Clock, CheckCircle, ArrowRight, BarChart3 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -102,7 +102,20 @@ export default function Home() {
   const [copied, setCopied] = useState('');
   const [error, setError] = useState('');
   const [needsSignIn, setNeedsSignIn] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
   const blogFilename = `${result?.blog_post.slug || 'blog-post'}.md`;
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setIsSignedIn(!!data.session);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsSignedIn(!!session);
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   const agents = [
     { id: 1, name: 'Blog Writer', icon: '📝', color: '#7c6ef7' },
@@ -281,9 +294,11 @@ export default function Home() {
             )}
           </button>
 
-          <div style={{ marginTop: '10px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '13px' }}>
-            Sign in first to generate content and save it to your private history.
-          </div>
+          {!isSignedIn && (
+            <div style={{ marginTop: '10px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '13px' }}>
+              Sign in first to generate content and save it to your private history.
+            </div>
+          )}
 
           {error && (
             <div style={{ marginTop: '16px', padding: '12px 16px', background: 'rgba(239,68,68,0.1)', border: '0.5px solid rgba(239,68,68,0.3)', borderRadius: '10px', color: '#f87171', fontSize: '14px' }}>
@@ -341,9 +356,16 @@ export default function Home() {
   <div style={{ display: 'flex', gap: '8px' }}>
     <button
       onClick={() => {
-        const clientId = '86kg8zpq9jbo07';
-        const redirectUri = encodeURIComponent('https://conteflow-pipeline.vercel.app/api/linkedin/callback');
+        const clientId = process.env.NEXT_PUBLIC_LINKEDIN_CLIENT_ID;
+        const callbackUrl = process.env.NEXT_PUBLIC_LINKEDIN_REDIRECT_URI || `${window.location.origin}/api/linkedin/callback`;
+        const redirectUri = encodeURIComponent(callbackUrl);
         const scope = encodeURIComponent('openid profile email w_member_social');
+
+        if (!clientId) {
+          alert('LinkedIn client ID is not configured.');
+          return;
+        }
+
         window.location.href = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
       }}
       style={{

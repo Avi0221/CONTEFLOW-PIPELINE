@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
   const error = searchParams.get('error');
+  const redirectUri = process.env.LINKEDIN_REDIRECT_URI || `${new URL(req.url).origin}/api/linkedin/callback`;
 
   if (error || !code) {
     return NextResponse.redirect(
@@ -27,7 +28,7 @@ export async function GET(req: NextRequest) {
         body: new URLSearchParams({
           grant_type: 'authorization_code',
           code,
-          redirect_uri: process.env.LINKEDIN_REDIRECT_URI!,
+          redirect_uri: redirectUri,
           client_id: process.env.NEXT_PUBLIC_LINKEDIN_CLIENT_ID!,
           client_secret: process.env.LINKEDIN_CLIENT_SECRET!
         })
